@@ -1,6 +1,9 @@
 from datetime import datetime
 import logging
 import cv2
+from nmea import input_stream, data_frame
+import config
+
 
 RECORD_VIDEO = False
 DEBUG_MODE = True
@@ -9,6 +12,16 @@ DEBUG_MODE = True
 def get_location():
     la = None
     lo = None
+    try:
+        gps_stream = input_stream.GenericInputStream.open_stream(config.gps_port, config.gps_baudrate)
+        gps_frame = data_frame.DataFrame.get_next_frame(gps_stream)
+        la = gps_frame.latitude
+        lo = gps_frame.longitude
+        gps_stream.ensure_closed()
+    except Exception as ex:
+        logging.error(ex)
+        la = None
+        lo = None
     return la, lo
 
 
