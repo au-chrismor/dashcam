@@ -1,15 +1,32 @@
 from datetime import datetime
 import logging
 import cv2
+import sys
+from nmea import input_stream, nmea_message, data_frame
+import config
 
-RECORD_VIDEO = False
+
+RECORD_VIDEO = True
 DEBUG_MODE = True
 
 
 def get_location():
     la = None
     lo = None
-    return la, lo
+    vel = 0
+    try:
+        gps_stream = input_stream.GenericInputStream.open_stream(path=config.gps_port, baud=config.gps_baudrate)
+        gps_frame = data_frame.DataFrame.get_next_frame(gps_stream)
+        la = gps_frame.latitude
+        lo = gps_frame.longitude
+        vel = gps_frame.velocity
+        gps_stream.ensure_closed()
+    except Exception as ex:
+        print(f'Error opening GPS stream: {ex}')
+        la = None
+        lo = None
+        vel = 0
+    return la, lo, vel
 
 
 if __name__ == "__main__":
@@ -26,14 +43,14 @@ if __name__ == "__main__":
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
     fps = cap.get(cv2.CAP_PROP_FPS)
-    lat,lon = get_location()
+    lat,lon, vel = get_location()
     logging.debug(f'Width={width}, Height={height}, FPS={fps}')
     vpos = int(height) - 10
     if RECORD_VIDEO:
         logging.debug('Recording is enabled')
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         stamp = datetime.now()
-        out = cv2.VideoWriter(f'{stamp.strftime("%Y%m%d%H%M%S")}.avi',
+        out = cv2.VideoWriter(f'{config.video_path}/{stamp.strftime("%Y%m%d%H%M%S")}.avi',
                               fourcc,
                               fps,
                               (int(width), int(height)))
@@ -55,7 +72,7 @@ if __name__ == "__main__":
             if lat is None:
                 strText = f'{dt.strftime("%d-%b-%Y %H:%M:%S")} - GPS Error?'
             else:
-                strText = f'{dt.strftime("%d-%b-%Y %H:%M:%S")} - {lat}, {lon}'
+                strText = f'{dt.strftime("%d-%b-%Y %H:%M:%S")} | {lat:.3f}, {lon:.3f} | {(vel/1.582):.1f}Km/h'
             cv2.putText(frame,
                         strText,
                         (25, vpos),
