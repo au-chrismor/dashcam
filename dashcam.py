@@ -28,7 +28,7 @@ def get_location():
         vel = 0
     return la, lo, vel
 
-def create_video_file():
+def create_video_file(width=640, height=480, fps=30):
     logging.debug('Recording is enabled')
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     stamp = datetime.now()
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             logging.error('Storage open failed.  Skipping save')
             RECORD_VIDEO = False
         """
-        out = create_video_file()
+        out = create_video_file(width=width, height=height, fps=fps)
         if out is None:
             RECORD_VIDEO = False
     while True:
