@@ -59,18 +59,6 @@ if __name__ == "__main__":
     logging.debug(f'Width={width}, Height={height}, FPS={fps}')
     vpos = int(height) - 10
     if RECORD_VIDEO:
-        """
-        logging.debug('Recording is enabled')
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        stamp = datetime.now()
-        out = cv2.VideoWriter(f'{config.video_path}/{stamp.strftime("%Y%m%d%H%M%S")}.avi',
-                              fourcc,
-                              fps,
-                              (int(width), int(height)))
-        if out is None:
-            logging.error('Storage open failed.  Skipping save')
-            RECORD_VIDEO = False
-        """
         out = create_video_file(width=width, height=height, fps=fps)
         if out is None:
             RECORD_VIDEO = False
