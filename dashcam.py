@@ -28,6 +28,18 @@ def get_location():
         vel = 0
     return la, lo, vel
 
+def create_video_file():
+    logging.debug('Recording is enabled')
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    stamp = datetime.now()
+    out = cv2.VideoWriter(f'{config.video_path}/{stamp.strftime("%Y%m%d%H%M%S")}.avi',
+                          fourcc,
+                          fps,
+                          (int(width), int(height)))
+    if out is None:
+        logging.error('Storage open failed.  Skipping save')
+    return out
+
 
 if __name__ == "__main__":
     if DEBUG_MODE:
@@ -47,6 +59,7 @@ if __name__ == "__main__":
     logging.debug(f'Width={width}, Height={height}, FPS={fps}')
     vpos = int(height) - 10
     if RECORD_VIDEO:
+        """
         logging.debug('Recording is enabled')
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         stamp = datetime.now()
@@ -56,6 +69,10 @@ if __name__ == "__main__":
                               (int(width), int(height)))
         if out is None:
             logging.error('Storage open failed.  Skipping save')
+            RECORD_VIDEO = False
+        """
+        out = create_video_file()
+        if out is None:
             RECORD_VIDEO = False
     while True:
         ret, frame = cap.read()
