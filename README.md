@@ -9,3 +9,6 @@ This is probably *NOT* the cheapest way to get a DashCam for your vehicle, but i
 * OpenCV for image processing
 
 The GPS module gets around the issue that the Pi has no built-in timekeeping, and as a bonus we can track where we are.
+
+If you get errors at runtime about nmea.core being missing, there seems to be an issue with the code in PyPy.  Check out the nmea_parser code from:
+https://gitlab.com/bek3/nmea_parser
